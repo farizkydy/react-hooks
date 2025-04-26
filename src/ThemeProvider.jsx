@@ -1,11 +1,11 @@
 import { useState } from "react";
 import ThemeContext from "./ThemeContext";
+// code here
 
-const ThemeProvider = ({ children }) => {
+const TodoProvider = ({ children }) => {
   const [theme, setTheme] = useState("light");
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
   return (
@@ -15,4 +15,4 @@ const ThemeProvider = ({ children }) => {
   );
 }
 
-export default ThemeProvider
+export default TodoProvider
