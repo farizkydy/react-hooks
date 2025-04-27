@@ -1,48 +1,69 @@
+import axios from 'axios';
 import { useState, useEffect } from 'react';
 
 function App() {
-  const [todos, setTodos] = useState([]);
-  const [input, setInput] = useState('');
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true)
+  const [name, setName] = useState("")
+  const [job, setJob] = useState("")
+  const API_URL = 'https://6580f9853dfdd1b11c424344.mockapi.io/rakamin/employee'
+
 
   // Load data dari localStorage saat pertama kali render
   useEffect(() => {
-    const savedTodos = JSON.parse(localStorage.getItem('todos')) || [];
-    setTodos(savedTodos);
+    getData()
   }, []);
 
-  // Simpan ke localStorage setiap kali todos berubah
-  useEffect(() => {
-    localStorage.setItem('todos', JSON.stringify(todos));
-  }, [todos]);
 
-  const handleAddTodo = () => {
-    if (input.trim() === '') return;
-    setTodos([...todos, input]);
-    setInput('');
-  };
+  const getData = () => {
+    axios.get(API_URL)
+    .then(response => {
+      console.log(response)
+      setData(response.data); // reqres.in return { data: [...] }
+      setLoading(false);
+    })
+    .catch(error => {
+      console.error('Error fetching users:', error);
+      setLoading(false);
+    });
+  }
 
-  const handleRemoveTodo = (index) => {
-    const newTodos = todos.filter((_, i) => i !== index);
-    setTodos(newTodos);
-  };
+  const postData = () => {
+    axios.post(API_URL, {
+      name: name,
+      email: job
+    }).then(() => {
+    getData()
+  }).catch((error) => {
+    alert('something when wrong')
+  })
+  }
 
+  if (loading) return <p>loading</p>
   return (
     <div>
-      <h2>To-Do List</h2>
-      <input
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="Tambahkan to-do"
-      />
-      <button onClick={handleAddTodo}>Tambah</button>
-      <ul>
-        {todos.map((todo, index) => (
-          <li key={index}>
-            {todo} <button onClick={() => handleRemoveTodo(index)}>Hapus</button>
-          </li>
-        ))}
-      </ul>
+    <h1>User List</h1>
+    <div className="form" style={{ marginBottom: '20px'}}>
+      <input type="text"
+      value={name}
+      onChange={e => setName(e.target.value)}
+      placeholder='Input your name' />
+
+      <input type="text"
+      value={job}
+      onChange={e => setJob(e.target.value)}
+      placeholder='Input your job' />  
+
+      <button onClick={postData}>Create User</button>
     </div>
+    <ul>
+      {data.map(user => (
+        <li key={user.id}>
+          {user.name} {user.email}
+        </li>
+      ))}
+    </ul>
+  </div>
   );
 }
 
